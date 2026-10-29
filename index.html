@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>泥涌 BBQ 燒烤物資清單 Checklist</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #f8fafc;
+    }
+    .custom-checkbox:checked {
+      background-color: #10b981;
+      border-color: #10b981;
+    }
+    .completed-text {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+    /* Hide scrollbar for category tabs */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="text-slate-800 pb-20">
+
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-2xl mx-auto px-4 py-3 flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-fire-burner text-2xl text-amber-100"></i>
+          <h1 class="text-lg font-bold tracking-wide">BBQ 燒烤準備 Checklist</h1>
+        </div>
+        <button id="configBtn" class="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition flex items-center gap-1">
+          <i class="fa-solid fa-cloud"></i> 雲端設定
+        </button>
+      </div>
+
+      <!-- Overall Progress -->
+      <div class="mt-0.5">
+        <div class="flex justify-between text-xs font-semibold mb-1">
+          <span id="progressText">完成度: 0/0 (0%)</span>
+          <span id="syncStatus" class="text-amber-100 flex items-center gap-1">
+            <i class="fa-solid fa-spinner fa-spin"></i> 連線中...
+          </span>
+        </div>
+        <div class="w-full bg-black/20 rounded-full h-2.5 overflow-hidden">
+          <div id="progressBar" class="bg-emerald-400 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-2xl mx-auto px-4 pt-4 space-y-5">
+
+    <!-- Category Filter & Assignee Filter Tabs -->
+    <div class="space-y-2">
+      <div class="text-xs font-bold text-slate-500 flex items-center gap-1">
+        <i class="fa-solid fa-filter"></i> 物資類別篩選：
+      </div>
+      <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
+        <button class="cat-tab bg-orange-500 text-white px-3 py-1.5 rounded-full font-medium whitespace-nowrap shadow-sm" data-category="all">全部類別</button>
+        <button class="cat-tab bg-white text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap" data-category="meat">🥩 肉類海鮮</button>
+        <button class="cat-tab bg-white text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap" data-category="veg">🥬 蔬菜菇類</button>
+        <button class="cat-tab bg-white text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap" data-category="staple">🍞 主食甜品</button>
+        <button class="cat-tab bg-white text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap" data-category="drink">🥤 飲品冰塊</button>
+        <button class="cat-tab bg-white text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap" data-category="tools">🔥 燒烤工具</button>
+        <button class="cat-tab bg-white text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap" data-category="tableware">🍽️ 餐具衛生</button>
+        <button class="cat-tab bg-white text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap" data-category="personal">🦟 防護個人</button>
+      </div>
+
+      <div class="text-xs font-bold text-slate-500 flex items-center gap-1 pt-1">
+        <i class="fa-solid fa-user-check"></i> 按負責人置頂：
+      </div>
+      <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+        <button class="assignee-tab bg-slate-800 text-white px-3 py-1 rounded-full font-medium whitespace-nowrap" data-assignee="all">全部所有人</button>
+        <button class="assignee-tab bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-assignee="Wallace">👤 Wallace</button>
+        <button class="assignee-tab bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-assignee="Felix">👤 Felix</button>
+        <button class="assignee-tab bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-assignee="Alco">👤 Alco</button>
+        <button class="assignee-tab bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-assignee="Ceci">👤 Ceci</button>
+        <button class="assignee-tab bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap" data-assignee="Lily">👤 Lily</button>
+      </div>
+    </div>
+
+    <!-- Add Item Card -->
+    <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100 space-y-2">
+      <div class="flex gap-2">
+        <input type="text" id="newItemName" placeholder="物資名稱 (如: 啤酒 1箱)" class="flex-1 bg-slate-50 border border-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+        <select id="newItemCat" class="bg-slate-50 border border-slate-200 text-xs rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <option value="meat">🥩 肉類</option>
+          <option value="veg">🥬 蔬菜</option>
+          <option value="staple">🍞 主食</option>
+          <option value="drink">🥤 飲品</option>
+          <option value="tools">🔥 工具</option>
+          <option value="tableware">🍽️ 餐具</option>
+          <option value="personal">🦟 防護</option>
+        </select>
+      </div>
+      <div class="flex gap-2">
+        <input type="text" id="newItemDetail" placeholder="數量 / 詳細說明 (選填，如: 2包，買喜力)" class="flex-1 bg-slate-50 border border-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+        <select id="newItemAssignee" class="bg-slate-50 border border-slate-200 text-xs rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <option value="">負責人(可選)</option>
+          <option value="Wallace">Wallace</option>
+          <option value="Felix">Felix</option>
+          <option value="Alco">Alco</option>
+          <option value="Ceci">Ceci</option>
+          <option value="Lily">Lily</option>
+        </select>
+        <button id="addItemBtn" class="bg-orange-500 hover:bg-orange-600 text-white text-xs px-4 py-2 rounded-lg font-medium transition shadow-sm flex items-center gap-1 shrink-0">
+          <i class="fa-solid fa-plus"></i> 新增
+        </button>
+      </div>
+    </div>
+
+    <!-- List Container -->
+    <div id="checklistContainer" class="space-y-4">
+      <!-- Dynamic Categories & Items Rendered Here -->
+    </div>
+  </main>
+
+  <!-- Google Sheets Sync Configuration Modal -->
+  <div id="configModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-link text-orange-500"></i> Google Sheet 雲端設定
+        </h3>
+        <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Lock Overlay if Admin Password Not Entered -->
+      <div id="modalLockSection" class="space-y-3">
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 flex items-center gap-2">
+          <i class="fa-solid fa-lock text-amber-600 text-lg"></i>
+          <span>雲端網址已加密保護，輸入管理員密碼即可修改網址。</span>
+        </div>
+        <div class="flex gap-2">
+          <input type="password" id="adminPasswordInput" placeholder="請輸入管理密碼..." class="flex-1 border border-slate-300 text-xs rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none">
+          <button id="unlockAdminBtn" class="px-4 py-2 text-xs bg-slate-800 text-white rounded-lg font-medium shadow hover:bg-slate-700">解鎖</button>
+        </div>
+      </div>
+
+      <!-- Admin Config Controls (Hidden by default) -->
+      <div id="modalAdminSection" class="space-y-3 hidden border-t pt-3">
+        <div class="space-y-1">
+          <label class="text-xs font-semibold text-slate-700">Google Script Web App API URL</label>
+          <input type="text" id="apiUrlInput" class="w-full border border-slate-300 text-xs rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none">
+        </div>
+        <div class="flex justify-between items-center pt-2">
+          <button id="clearApiBtn" class="px-3 py-1.5 text-xs text-red-500 hover:bg-red-50 rounded-lg border border-red-200 font-medium">清除連結</button>
+          <button id="saveApiBtn" class="px-4 py-1.5 text-xs bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium shadow">儲存網址</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript App Logic -->
+  <script>
+    // Preserved Default Web App URL
+    const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbwMjPt3EUasEPcs7dZV9XNqvFhHz_ZYTMRfWHRV9gXFGoMdzcjpVSGyBvilVerdVYvx/exec";
+    
+    // Assignees List
+    const assignees = ["Wallace", "Felix", "Alco", "Ceci", "Lily"];
+
+    // Initial BBQ Items Data synced with Google Sheet structure
+    const defaultData = [
+      // 肉類海鮮
+      { id: '1', name: '雞翼', detail: '約 2 磅 ~18 隻（每人約 3 隻）', cat: 'meat', checked: false, assignee: 'Wallace' },
+      { id: '2', name: '牛扒', detail: '3 塊（靚少少嘅）', cat: 'meat', checked: false, assignee: 'Felix' },
+      { id: '3', name: '豬頸肉', detail: '2 塊', cat: 'meat', checked: false, assignee: 'Alco' },
+      { id: '4', name: '腸仔', detail: '芝士腸 / 廚師腸 各一包', cat: 'meat', checked: false, assignee: 'Ceci' },
+      { id: '5', name: '丸類', detail: '貢丸 / 魚蛋 / 墨魚丸 / 芝士丸 共1磅~', cat: 'meat', checked: false, assignee: 'Lily' },
+      { id: '6', name: '魷魚 / 蝦', detail: '海蝦 或 魷魚仔', cat: 'meat', checked: false, assignee: '' },
+
+      // 蔬菜菇類
+      { id: '7', name: '粟米', detail: '2 條（每條切半）', cat: 'veg', checked: false, assignee: '' },
+      { id: '8', name: '蕃薯', detail: '中小型，包錫紙烤', cat: 'veg', checked: false, assignee: '' },
+      { id: '9', name: '金針菇 / 杏鮑菇', detail: '2 包（約 400g）', cat: 'veg', checked: false, assignee: '' },
+      { id: '10', name: '翠玉瓜', detail: '2 條（切片）', cat: 'veg', checked: false, assignee: '' },
+      { id: '11', name: '茄子', detail: '1 條（一開二）', cat: 'veg', checked: false, assignee: '' },
+
+      // 主食甜品
+      { id: '12', name: '方包 / 蒜蓉包', detail: '1 包（約 8-10 片）', cat: 'staple', checked: false, assignee: '' },
+      { id: '13', name: '棉花糖', detail: '1 大包（約 20-25 粒）', cat: 'staple', checked: false, assignee: '' },
+
+      // 飲品冰塊
+      { id: '14', name: '大裝蒸餾水', detail: '1.5L x 3 支（泥涌場有廁所自來水）', cat: 'drink', checked: false, assignee: '' },
+      { id: '15', name: '罐裝 / 紙包飲品', detail: '大支裝 x3，盒 or 罐裝 x3', cat: 'drink', checked: false, assignee: '' },
+      { id: '16', name: '冰塊 & 保溫袋', detail: '1-2 包冰塊 + 保溫袋/冰箱', cat: 'drink', checked: false, assignee: '' },
+
+      // 燒烤工具
+      { id: '17', name: '燒烤炭', detail: '1 箱（約 5 公斤）', cat: 'tools', checked: false, assignee: '' },
+      { id: '18', name: '蜜糖 & 蜜糖刷', detail: '蜜糖 1 支 + 刷 2 支', cat: 'tools', checked: false, assignee: '' },
+      { id: '19', name: '起火配件', detail: '炭精 1 包 + 打火機 1 個 + 報紙/樹葉', cat: 'tools', checked: false, assignee: '' },
+      { id: '20', name: '風扇 / 手搖扇', detail: '1-2 把', cat: 'tools', checked: false, assignee: '' },
+      { id: '21', name: '燒烤叉', detail: '6 支（每人 1 支）', cat: 'tools', checked: false, assignee: '' },
+      { id: '22', name: '燒烤網', detail: '1-2 張（烤細小食材/金針菇/吐司）', cat: 'tools', checked: false, assignee: '' },
+      { id: '23', name: '食物鉗 / 燒烤夾', detail: '2 支', cat: 'tools', checked: false, assignee: '' },
+      { id: '24', name: '錫紙 & 剪刀', detail: '錫紙 1 卷 + 剪刀 2 個', cat: 'tools', checked: false, assignee: '' },
+
+      // 餐具衛生
+      { id: '25', name: '膠/紙碗碟 & 杯', detail: '碗碟 12 個 + 紙杯 12 個', cat: 'tableware', checked: false, assignee: '' },
+      { id: '26', name: '餐具套裝', detail: '筷子 / 叉 12 套', cat: 'tableware', checked: false, assignee: '' },
+      { id: '27', name: '清潔紙巾', detail: '濕紙巾 1 大包 + 乾紙巾/廚房紙 2 包', cat: 'tableware', checked: false, assignee: '' },
+      { id: '28', name: '消毒 & 垃圾袋', detail: '消毒酒精 1 支 + 大垃圾袋 3 個', cat: 'tableware', checked: false, assignee: '' },
+
+      // 防護個人
+      { id: '29', name: '防蚊用品', detail: '蚊怕水 / 蚊貼 1 支', cat: 'personal', checked: false, assignee: '' },
+      { id: '30', name: '防曬用品', detail: '防曬油 / 太陽眼鏡 / 遮陽帽', cat: 'personal', checked: false, assignee: '' },
+      { id: '31', name: '電子與藥物', detail: '尿袋 + 線 / 常用藥物 / 止血貼', cat: 'personal', checked: false, assignee: '' }
+    ];
+
+    const categoryNames = {
+      meat: '🥩 肉類與海鮮',
+      veg: '🥬 蔬菜與菇類',
+      staple: '🍞 主食與甜品',
+      drink: '🥤 飲品與冰塊',
+      tools: '🔥 燒烤工具',
+      tableware: '🍽️ 餐具與衛生用品',
+      personal: '🦟 個人與防護用品'
+    };
+
+    // App State
+    let items = [];
+    let activeCategory = 'all';
+    let selectedAssigneeFilter = 'all';
+    let apiUrl = localStorage.getItem('bbq_api_url') || DEFAULT_API_URL;
+
+    // Elements
+    const checklistContainer = document.getElementById('checklistContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const syncStatus = document.getElementById('syncStatus');
+    const configModal = document.getElementById('configModal');
+    const apiUrlInput = document.getElementById('apiUrlInput');
+    const modalLockSection = document.getElementById('modalLockSection');
+    const modalAdminSection = document.getElementById('modalAdminSection');
+
+    // Initialize App
+    function init() {
+      const savedData = localStorage.getItem('bbq_checklist_items');
+      if (savedData) {
+        try { items = JSON.parse(savedData); } catch (e) { items = defaultData; }
+      } else {
+        items = defaultData;
+      }
+
+      updateSyncStatusUI();
+      renderChecklist();
+
+      // Fetch cloud data if API URL exists
+      if (apiUrl) {
+        fetchCloudData();
+      }
+    }
+
+    // Save Data locally & cloud
+    function saveData() {
+      localStorage.setItem('bbq_checklist_items', JSON.stringify(items));
+      updateProgress();
+
+      if (apiUrl) {
+        syncToCloud();
+      }
+    }
+
+    // Render Checklist UI
+    function renderChecklist() {
+      checklistContainer.innerHTML = '';
+
+      const categoriesToRender = activeCategory === 'all' 
+        ? Object.keys(categoryNames) 
+        : [activeCategory];
+
+      let hasItems = false;
+
+      categoriesToRender.forEach(catKey => {
+        let categoryItems = items.filter(item => item.cat === catKey);
+        if (categoryItems.length === 0) return;
+
+        // If Assignee Filter is Active, sort relevant assignee items to top
+        if (selectedAssigneeFilter !== 'all') {
+          categoryItems.sort((a, b) => {
+            const aIsMatch = a.assignee === selectedAssigneeFilter;
+            const bIsMatch = b.assignee === selectedAssigneeFilter;
+            if (aIsMatch && !bIsMatch) return -1;
+            if (!aIsMatch && bIsMatch) return 1;
+            return 0;
+          });
+        }
+
+        hasItems = true;
+
+        const catSection = document.createElement('div');
+        catSection.className = 'bg-white rounded-xl p-4 shadow-sm border border-slate-100 space-y-3';
+
+        const completedCount = categoryItems.filter(i => i.checked).length;
+        const catTitle = document.createElement('h2');
+        catTitle.className = 'text-xs font-bold text-slate-700 pb-2 border-b border-slate-100 flex justify-between items-center';
+        catTitle.innerHTML = `
+          <span>${categoryNames[catKey]}</span>
+          <span class="text-[11px] font-normal text-slate-400">${completedCount}/${categoryItems.length} 已完成</span>
+        `;
+        catSection.appendChild(catTitle);
+
+        const itemList = document.createElement('div');
+        itemList.className = 'space-y-2';
+
+        categoryItems.forEach(item => {
+          const isTargetAssignee = selectedAssigneeFilter !== 'all' && item.assignee === selectedAssigneeFilter;
+          const itemRow = document.createElement('div');
+          
+          itemRow.className = `flex items-start justify-between gap-2 p-2 rounded-lg transition ${
+            isTargetAssignee ? 'bg-amber-50/80 border border-amber-200' : 'hover:bg-slate-50'
+          } ${item.checked ? 'bg-slate-50/60' : ''}`;
+
+          // Options for Assignee Select
+          let assigneeOptionsHtml = `<option value="">未指定</option>`;
+          assignees.forEach(a => {
+            assigneeOptionsHtml += `<option value="${a}" ${item.assignee === a ? 'selected' : ''}>${a}</option>`;
+          });
+
+          itemRow.innerHTML = `
+            <div class="flex items-start gap-2.5 flex-1 min-w-0">
+              <input type="checkbox" ${item.checked ? 'checked' : ''} 
+                onchange="toggleCheck('${item.id}')"
+                class="custom-checkbox mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0">
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-slate-800 ${item.checked ? 'completed-text' : ''}">
+                  ${escapeHtml(item.name)}
+                  ${isTargetAssignee ? `<span class="inline-block bg-amber-500 text-white text-[9px] px-1.5 py-0.2 rounded-full ml-1 font-normal">👉 你負責</span>` : ''}
+                </p>
+                ${item.detail ? `<p class="text-[11px] text-slate-500 leading-tight mt-0.5">${escapeHtml(item.detail)}</p>` : ''}
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <select onchange="updateAssignee('${item.id}', this.value)"
+                class="text-[11px] bg-slate-100 border-none rounded px-1.5 py-1 text-slate-700 focus:ring-1 focus:ring-orange-500 focus:bg-white cursor-pointer">
+                ${assigneeOptionsHtml}
+              </select>
+              <button onclick="deleteItem('${item.id}')" class="text-slate-300 hover:text-red-500 text-xs p-1">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          `;
+          itemList.appendChild(itemRow);
+        });
+
+        catSection.appendChild(itemList);
+        checklistContainer.appendChild(catSection);
+      });
+
+      if (!hasItems) {
+        checklistContainer.innerHTML = `<p class="text-center text-slate-400 py-10 text-xs">沒有相關物資項目</p>`;
+      }
+
+      updateProgress();
+    }
+
+    // Toggle Item Check
+    window.toggleCheck = function(id) {
+      const item = items.find(i => i.id === id);
+      if (item) {
+        item.checked = !item.checked;
+        saveData();
+        renderChecklist();
+      }
+    };
+
+    // Update Assignee
+    window.updateAssignee = function(id, val) {
+      const item = items.find(i => i.id === id);
+      if (item) {
+        item.assignee = val;
+        saveData();
+        renderChecklist();
+      }
+    };
+
+    // Delete Item
+    window.deleteItem = function(id) {
+      if (confirm('確定要刪除此物資項目嗎？')) {
+        items = items.filter(i => i.id !== id);
+        saveData();
+        renderChecklist();
+      }
+    };
+
+    // Update Overall Progress UI
+    function updateProgress() {
+      const total = items.length;
+      const completed = items.filter(i => i.checked).length;
+      const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+      progressBar.style.width = `${pct}%`;
+      progressText.textContent = `完成度: ${completed}/${total} (${pct}%)`;
+    }
+
+    // Filter Tabs Click Handlers
+    document.querySelectorAll('.cat-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.cat-tab').forEach(t => {
+          t.className = 'cat-tab bg-white text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap';
+        });
+        e.target.className = 'cat-tab bg-orange-500 text-white px-3 py-1.5 rounded-full font-medium whitespace-nowrap shadow-sm';
+        activeCategory = e.target.dataset.category;
+        renderChecklist();
+      });
+    });
+
+    // Assignee Filter Tabs Click Handlers
+    document.querySelectorAll('.assignee-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.assignee-tab').forEach(t => {
+          t.className = 'assignee-tab bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-medium whitespace-nowrap';
+        });
+        e.target.className = 'assignee-tab bg-slate-800 text-white px-3 py-1 rounded-full font-medium whitespace-nowrap shadow-sm';
+        selectedAssigneeFilter = e.target.dataset.assignee;
+        renderChecklist();
+      });
+    });
+
+    // Add New Custom Item
+    document.getElementById('addItemBtn').addEventListener('click', () => {
+      const nameInput = document.getElementById('newItemName');
+      const detailInput = document.getElementById('newItemDetail');
+      const catInput = document.getElementById('newItemCat');
+      const assigneeInput = document.getElementById('newItemAssignee');
+
+      const name = nameInput.value.trim();
+      if (!name) return;
+
+      const newItem = {
+        id: Date.now().toString(),
+        name: name,
+        detail: detailInput.value.trim(),
+        cat: catInput.value,
+        checked: false,
+        assignee: assigneeInput.value
+      };
+
+      items.push(newItem);
+      nameInput.value = '';
+      detailInput.value = '';
+      saveData();
+      renderChecklist();
+    });
+
+    // Cloud Sync Functions
+    function updateSyncStatusUI() {
+      if (apiUrl) {
+        syncStatus.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-300"></i> Google Sheet 已同步`;
+      } else {
+        syncStatus.innerHTML = `<i class="fa-solid fa-hard-drive text-amber-200"></i> 本機儲存`;
+      }
+    }
+
+    async function fetchCloudData() {
+      if (!apiUrl) return;
+      try {
+        syncStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 同步中...`;
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+        if (data && Array.isArray(data.items)) {
+          items = data.items;
+          localStorage.setItem('bbq_checklist_items', JSON.stringify(items));
+          renderChecklist();
+        }
+        updateSyncStatusUI();
+      } catch (err) {
+        console.error('Fetch cloud data error:', err);
+        syncStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-300"></i> 同步離線`;
+      }
+    }
+
+    async function syncToCloud() {
+      if (!apiUrl) return;
+      try {
+        await fetch(apiUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items })
+        });
+      } catch (err) {
+        console.error('Cloud Sync error:', err);
+      }
+    }
+
+    // Modal Control & Password Protection
+    document.getElementById('configBtn').addEventListener('click', () => {
+      apiUrlInput.value = apiUrl;
+      modalLockSection.classList.remove('hidden');
+      modalAdminSection.classList.add('hidden');
+      document.getElementById('adminPasswordInput').value = '';
+      configModal.classList.remove('hidden');
+    });
+
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+      configModal.classList.add('hidden');
+    });
+
+    // Unlock Admin Panel with Password 'admin'
+    document.getElementById('unlockAdminBtn').addEventListener('click', () => {
+      const pwd = document.getElementById('adminPasswordInput').value;
+      if (pwd === 'admin') {
+        modalLockSection.classList.add('hidden');
+        modalAdminSection.classList.remove('hidden');
+      } else {
+        alert('密碼不正確！預設密碼為: admin');
+      }
+    });
+
+    document.getElementById('saveApiBtn').addEventListener('click', () => {
+      apiUrl = apiUrlInput.value.trim();
+      localStorage.setItem('bbq_api_url', apiUrl);
+      configModal.classList.add('hidden');
+      updateSyncStatusUI();
+      if (apiUrl) fetchCloudData();
+    });
+
+    document.getElementById('clearApiBtn').addEventListener('click', () => {
+      apiUrl = '';
+      localStorage.removeItem('bbq_api_url');
+      apiUrlInput.value = '';
+      configModal.classList.add('hidden');
+      updateSyncStatusUI();
+    });
+
+    // Helper: Escape HTML
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Run Initialization on Window Load
+    window.onload = init;
+  </script>
+</body>
+</html>
